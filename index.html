@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link na Bio Pro | Seu Nome</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-glow': 'pulseGlow 2.5s infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '0.9', transform: 'scale(1.05)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass-panel {
+            background: rgba(18, 18, 28, 0.65);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dark .glass-button {
+            background: rgba(30, 30, 45, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.12);
+        }
+
+        .blob {
+            position: fixed;
+            filter: blur(70px);
+            opacity: 0.5;
+            z-index: 0;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(150, 150, 150, 0.3);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 relative overflow-x-hidden">
+
+    <!-- Background Decoration Blobs -->
+    <div class="top-[-10%] left-[-10%] w-96 h-96 bg-purple-400 dark:bg-purple-900 blob animate-pulse-glow"></div>
+    <div class="bottom-[-10%] right-[-10%] w-96 h-96 bg-pink-400 dark:bg-pink-900 blob animate-pulse-glow" style="animation-delay: 1s;"></div>
+    <div class="top-[40%] right-[10%] w-72 h-72 bg-blue-400 dark:bg-blue-900 blob animate-pulse-glow" style="animation-delay: 1.5s;"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-md mx-auto px-4 py-6 flex flex-col min-h-screen justify-between">
+        
+        <!-- Header Controls (Admin Edit, Theme Toggle, Share) -->
+        <header class="flex justify-between items-center mb-6">
+            <button onclick="toggleEditPanel()" class="px-3 py-1.5 rounded-full glass-panel flex items-center gap-2 text-xs font-semibold hover:scale-105 active:scale-95 transition-all text-purple-600 dark:text-purple-400">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Editar Bio</span>
+            </button>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="openShareModal()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-200" title="Compartilhar">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+                
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-slate-700 dark:text-slate-200" title="Alternar Tema">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Profile Section -->
+        <main class="flex-grow flex flex-col items-center">
+            
+            <!-- Avatar with Badge -->
+            <div class="relative mb-3 group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                <img id="profileImg" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" alt="Foto de Perfil" class="relative w-28 h-28 rounded-full object-cover border-2 border-white dark:border-slate-800 shadow-xl">
+                
+                <!-- Status Badge (Online/Live) -->
+                <span class="absolute bottom-1 right-1 bg-emerald-500 text-white rounded-full p-1 text-xs w-6 h-6 flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-md" title="Online Agora">
+                    <i class="fa-solid fa-bolt text-[10px]"></i>
+                </span>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="text-center mb-4">
+                <div class="flex items-center justify-center gap-1.5">
+                    <h1 id="profileName" class="font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        Ana Silva
+                    </h1>
+                    <i class="fa-solid fa-circle-check text-blue-500 text-base" title="Conta Verificada"></i>
+                </div>
+                <p id="profileTitle" class="text-xs font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400 mt-0.5">
+                    Criadora de Conteúdo & Designer UI/UX
+                </p>
+                <p id="profileBio" class="text-xs text-slate-600 dark:text-slate-300 max-w-xs leading-relaxed mt-2 mx-auto">
+                    Ajudando marcas e criadores a se destacarem no mercado digital 🚀 | +50k na comunidade ✨
+                </p>
+            </div>
+
+            <!-- Interactive Stats Bar -->
+            <div class="flex items-center justify-around w-full glass-panel py-2.5 px-4 rounded-2xl mb-6 border border-white/30 dark:border-slate-800 text-center">
+                <div>
+                    <span class="block text-sm font-bold text-slate-900 dark:text-white">12.4k</span>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Acessos</span>
+                </div>
+                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
+                <button onclick="addLike()" class="group flex flex-col items-center">
+                    <span id="likeCount" class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-pink-500 transition-colors">1.8k</span>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-heart text-pink-500 text-[10px] group-hover:scale-125 transition-transform"></i> Curtidas
+                    </span>
+                </button>
+                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700"></div>
+                <div>
+                    <span class="block text-sm font-bold text-slate-900 dark:text-white">4.9 ★</span>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400">Avaliação</span>
+                </div>
+            </div>
+
+            <!-- Social Links Row -->
+            <div id="socialLinksContainer" class="flex items-center gap-3 mb-6 flex-wrap justify-center">
+                <a href="https://instagram.com" target="_blank" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:text-pink-500 hover:scale-110 transition-all shadow-sm">
+                    <i class="fa-brands fa-instagram text-lg"></i>
+                </a>
+                <a href="https://youtube.com" target="_blank" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:text-red-500 hover:scale-110 transition-all shadow-sm">
+                    <i class="fa-brands fa-youtube text-lg"></i>
+                </a>
+                <a href="https://tiktok.com" target="_blank" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:text-cyan-400 hover:scale-110 transition-all shadow-sm">
+                    <i class="fa-brands fa-tiktok text-lg"></i>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:text-blue-500 hover:scale-110 transition-all shadow-sm">
+                    <i class="fa-brands fa-linkedin-in text-lg"></i>
+                </a>
+                <a href="https://whatsapp.com" target="_blank" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:text-green-500 hover:scale-110 transition-all shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                </a>
+            </div>
+
+            <!-- Featured Highlight Box (Promo Banner) -->
+            <a href="#" class="relative group block w-full p-4 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white shadow-xl hover:shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden mb-5">
+                <div class="absolute top-0 right-0 px-3 py-1 bg-black/20 backdrop-blur-md rounded-bl-xl text-[9px] font-extrabold uppercase tracking-widest text-amber-300 flex items-center gap-1">
+                    <i class="fa-solid fa-fire"></i> Lançamento
+                </div>
+                <div class="flex items-center">
+                    <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center text-2xl mr-3.5 flex-shrink-0 backdrop-blur-md">
+                        🚀
+                    </div>
+                    <div class="text-left pr-4">
+                        <h2 class="font-bold text-sm leading-snug">Design System Pro 2026</h2>
+                        <p class="text-xs text-white/85 mt-0.5 leading-tight">Aprenda a criar interfaces do zero. Oferta por tempo limitado!</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right ml-auto text-sm opacity-80 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Category Section: Links Principais -->
+            <div class="w-full mb-6">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5 px-1 flex items-center gap-1.5">
+                    <i class="fa-solid fa-link text-[10px]"></i> Links Úteis & Serviços
+                </h3>
+
+                <div class="space-y-3">
+                    <a href="#" class="glass-button block w-full p-3.5 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98]">
+                        <div class="flex items-center">
+                            <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-base mr-3 flex-shrink-0">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <div class="text-left">
+                                <h2 class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Portfólio de Projetos</h2>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Veja meus trabalhos recentes</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right ml-auto text-xs text-slate-400"></i>
+                        </div>
+                    </a>
+
+                    <a href="#" class="glass-button block w-full p-3.5 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98]">
+                        <div class="flex items-center">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-base mr-3 flex-shrink-0">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <div class="text-left">
+                                <h2 class="font-semibold text-slate-800 dark:text-slate-100 text-xs">Agendamento de Consultoria</h2>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">Sessões de 45 min individuais</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right ml-auto text-xs text-slate-400"></i>
+                        </div>
+                    </a>
+
+                    <a href="#" class="glass-button block w-full p-3.5 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98]">
+                        <div class="flex items-center">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 flex items-center justify-center text-base mr-3 flex-shrink-0">
+                                <i class="fa-solid fa-gift"></i>
+                            </div>
+                            <div class="text-left">
+                                <h2 class="font-semibold text-slate-800 dark:text-slate-100 text-xs">E-book Gratuito de UI/UX</h2>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400">+5.000 downloads efetuados</p>
+                            </div>
+                            <i class="fa-solid fa-chevron-right ml-auto text-xs text-slate-400"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Category Section: Produtos / Vitrine Curta -->
+            <div class="w-full mb-6">
+                <div class="flex justify-between items-center mb-2.5 px-1">
+                    <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-bag-shopping text-[10px]"></i> Loja & Recursos
+                    </h3>
+                    <span class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold cursor-pointer">Ver todos</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass-panel p-3 rounded-2xl flex flex-col justify-between">
+                        <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=200" alt="Preset Notion" class="w-full h-24 object-cover rounded-xl mb-2">
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">Pack de Notion Pro</h4>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2">Organize sua rotina</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400">R$ 29</span>
+                            <button onclick="showToast('Produto adicionado ao carrinho!')" class="p-1.5 bg-purple-600 text-white rounded-lg text-xs hover:bg-purple-700 transition-colors">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-3 rounded-2xl flex flex-col justify-between">
+                        <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=200" alt="Presets Figma" class="w-full h-24 object-cover rounded-xl mb-2">
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">Figma UI Kit 2026</h4>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2">+200 componentes</p>
+                        <div class="flex items-center justify-between mt-auto">
+                            <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400">R$ 49</span>
+                            <button onclick="showToast('Produto adicionado ao carrinho!')" class="p-1.5 bg-purple-600 text-white rounded-lg text-xs hover:bg-purple-700 transition-colors">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spotify Track Player Widget -->
+            <div class="w-full mb-6">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2.5 px-1 flex items-center gap-1.5">
+                    <i class="fa-brands fa-spotify text-emerald-500 text-[12px]"></i> Música que me representa
+                </h3>
+                <div class="glass-panel p-2 rounded-2xl border border-white/30 dark:border-slate-800 overflow-hidden shadow-lg">
+                    <iframe id="spotifyIframe" class="rounded-xl w-full" src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <!-- Testimonial Slider / Social Proof -->
+            <div class="w-full glass-panel p-4 rounded-2xl mb-6 border border-white/30 dark:border-slate-800 text-center">
+                <div class="flex justify-center text-amber-400 text-xs mb-1.5 gap-1">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-xs italic text-slate-700 dark:text-slate-300 mb-2">
+                    "A mentoria da Ana mudou completamente meu posicionamento no mercado. Recomendo muito!"
+                </p>
+                <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">— Lucas Mendes, Designer Freelancer</span>
+            </div>
+
+            <!-- Newsletter Box -->
+            <div class="w-full glass-panel p-5 rounded-2xl mb-6 border border-white/30 dark:border-slate-800">
+                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-center text-xs mb-1">
+                    Faça parte do meu VIP Club 📬
+                </h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center mb-3">
+                    Receba dicas exclusivas semanais no seu e-mail. Zero spam.
+                </p>
+                <form onsubmit="handleSubscribe(event)" class="flex gap-2">
+                    <input type="email" required placeholder="Seu melhor e-mail" class="flex-grow px-3 py-2 text-xs rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition-colors shadow-md">
+                        Entrar
+                    </button>
+                </form>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center pt-4 border-t border-slate-200/50 dark:border-slate-800/50">
+            <p class="text-xs text-slate-400 dark:text-slate-500">
+                © 2026 <span id="footerName">Ana Silva</span> • Criado com LinkBio Pro
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- Live Customization / Edit Drawer -->
+    <div id="editDrawer" class="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white dark:bg-slate-900 shadow-2xl p-6 transform -translate-x-full transition-transform duration-300 overflow-y-auto border-r border-slate-200 dark:border-slate-800">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-slate-800 dark:text-white text-base">Personalizar Bio</h3>
+            <button onclick="toggleEditPanel()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Nome:</label>
+                <input id="inputName" type="text" value="Ana Silva" oninput="updateProfile()" class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Título / Cargo:</label>
+                <input id="inputTitle" type="text" value="Criadora de Conteúdo & Designer UI/UX" oninput="updateProfile()" class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">Biografia:</label>
+                <textarea id="inputBio" rows="3" oninput="updateProfile()" class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">Ajudando marcas e criadores a se destacarem no mercado digital 🚀 | +50k na comunidade ✨</textarea>
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">URL da Foto de Perfil:</label>
+                <input id="inputImg" type="text" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" oninput="updateProfile()" class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1 text-slate-700 dark:text-slate-300">ID / Link da Música do Spotify:</label>
+                <input id="inputSpotify" type="text" placeholder="Cole o Link ou ID do Spotify aqui..." oninput="updateSpotifyTrack()" class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <p class="text-[10px] text-slate-400 mt-1">Exemplo de link: open.spotify.com/track/<b>4cOdK2wGLETKBW3PvgPWqT</b></p>
+            </div>
+
+            <button onclick="toggleEditPanel(); showToast('Alterações salvas temporariamente!')" class="w-full py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors shadow-md mt-4">
+                Salvar Alterações
+            </button>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="glass-panel bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl relative border border-slate-200 dark:border-slate-800">
+            <button onclick="closeShareModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <h3 class="text-base font-bold text-slate-800 dark:text-slate-100 text-center mb-4">Compartilhar Perfil</h3>
+            
+            <!-- QR Code -->
+            <div class="flex justify-center mb-4">
+                <div class="bg-white p-3 rounded-2xl shadow-inner border border-slate-100">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://seu-link-da-bio.com" alt="QR Code" class="w-36 h-36">
+                </div>
+            </div>
+
+            <p class="text-xs text-center text-slate-500 dark:text-slate-400 mb-4">Escaneie para abrir no celular ou copie o link abaixo.</p>
+
+            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                <input id="shareInput" type="text" readonly value="https://seu-link-da-bio.com" class="bg-transparent text-xs text-slate-600 dark:text-slate-300 w-full focus:outline-none px-2">
+                <button onclick="copyToClipboard()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <i class="fa-regular fa-copy"></i> Copiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 translate-y-20 opacity-0 pointer-events-none z-50">
+        <i class="fa-solid fa-circle-check text-green-400 dark:text-green-600 text-sm"></i>
+        <span id="toastMessage">Mensagem enviada com sucesso!</span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let likes = 1842;
+        let isPlaying = false;
+
+        // Dark Mode
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Live Customization Drawer
+        function toggleEditPanel() {
+            const drawer = document.getElementById('editDrawer');
+            drawer.classList.toggle('-translate-x-full');
+        }
+
+        function updateProfile() {
+            const name = document.getElementById('inputName').value;
+            const title = document.getElementById('inputTitle').value;
+            const bio = document.getElementById('inputBio').value;
+            const img = document.getElementById('inputImg').value;
+
+            if (name) {
+                document.getElementById('profileName').textContent = name;
+                document.getElementById('footerName').textContent = name;
+            }
+            if (title) document.getElementById('profileTitle').textContent = title;
+            if (bio) document.getElementById('profileBio').textContent = bio;
+            if (img) document.getElementById('profileImg').src = img;
+        }
+
+        function updateSpotifyTrack() {
+            let val = document.getElementById('inputSpotify').value.trim();
+            if (!val) return;
+
+            let trackId = val;
+            if (val.includes('track/')) {
+                trackId = val.split('track/')[1].split('?')[0];
+            } else if (val.includes('spotify:track:')) {
+                trackId = val.replace('spotify:track:', '');
+            }
+
+            const iframe = document.getElementById('spotifyIframe');
+            iframe.src = `https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`;
+        }
+
+        // Like Counter
+        function addLike() {
+            likes++;
+            document.getElementById('likeCount').textContent = (likes / 1000).toFixed(1) + 'k';
+            showToast('Obrigado pela curtida! ❤️');
+        }
+
+        // Simulated Audio Toggle
+        function toggleAudio() {
+            isPlaying = !isPlaying;
+            const icon = document.getElementById('playIcon');
+            if (isPlaying) {
+                icon.className = 'fa-solid fa-pause text-xs';
+                showToast('Reproduzindo áudio...');
+            } else {
+                icon.className = 'fa-solid fa-play text-xs ml-0.5';
+                showToast('Áudio pausado.');
+            }
+        }
+
+        // Modals & Copy
+        function openShareModal() {
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function copyToClipboard() {
+            const shareInput = document.getElementById('shareInput');
+            shareInput.select();
+            shareInput.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showToast('Link copiado!');
+                closeShareModal();
+            } catch (err) {
+                showToast('Erro ao copiar.');
+            }
+        }
+
+        function handleSubscribe(e) {
+            e.preventDefault();
+            showToast('Inscrição realizada com sucesso! 🎉');
+            e.target.reset();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        window.onclick = function(e) {
+            const modal = document.getElementById('shareModal');
+            if (e.target === modal) closeShareModal();
+        }
+    </script>
+</body>
+</html>
